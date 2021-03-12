@@ -9,7 +9,6 @@ const $field = document.querySelector('.game__field');
 const $fieldRect = $field.getBoundingClientRect();
 
 const $gameBtn = document.querySelector('.game__button');
-const $icon = document.querySelector('.fa-play');
 const $playBtn = document.querySelector('.play__button');
 
 const $gameTimer = document.querySelector('.game__timer');
@@ -18,50 +17,83 @@ const $popUp = document.querySelector('.pop-up');
 const $popUpRefreshBtn = document.querySelector('.pop-up__refresh');
 const $popUpMessage = document.querySelector('.pop-up__message');
 
+const $icon = document.querySelector('.fas');
+
+const carrotSound = new Audio('./carrot/sound/carrot_pull.mp3');
+const bugSound = new Audio('./carrot/sound/bug_pull.mp3');
+const backGroundSound = new Audio('./carrot/sound/bg.mp3');
+const winSound = new Audio('./carrot/sound/game_win.mp3');
+const alertSound = new Audio('./carrot/sound/alert.wav');
+
 let started = false;  // 게임이 시작되었는지
-let score = 0;  // 게임 스코어
+let score  // 게임 스코어
 let timer = undefined;  // 타이머는 게임 시작 후 세팅
-let sec = 9;
+
+
+$field.addEventListener('click', onFieldClick);
 
 $gameBtn.addEventListener('click', () => {
   if (started) {
     stopGame();
 
   } else {
-    stratGame();
+    startGame();
   }
-  started = !started;
 });
 
+// 팝업 재시작 버튼
 $popUpRefreshBtn.addEventListener('click', () => {
-  $gameBtn.style.visibility = 'visible';
-  $icon.classList.add('fa-play');
-  $icon.classList.remove('fa-stop');
-  $popUp.classList.add('pop-up__hide');
-
-
+  startGame();
+  hidePopUp();
+  showPlayButton();
 });
 
-function stratGame() {
+
+
+function startGame() {
+  started = true;
   initGame();
   showStopButton();
   showTimerAndScore();
   startGameTimer();
+  playSound(backGroundSound);
 }
-
 
 function stopGame() {
-  clearInterval(timer);
-  $popUp.classList.remove('pop-up__hide');
-  $gameBtn.style.visibility = 'hidden';
-
+  started = false;
+  stopGameTimer();
+  hideGameButton();
+  showPopUpWithText('REPLAY❔');
+  playSound(alertSound);
+  stopSound(backGroundSound);
 }
 
-
+function finishGame(win) {
+  started = false;
+  hideGameButton();
+  if (win) {
+    playSound(winSound);
+  } else {
+    playSound(bugSound);
+  }
+  stopGameTimer();
+  stopSound(backGroundSound);
+  showPopUpWithText(win ? 'YOU WON 🎉' : 'YOU LOST 🤧');
+}
 
 function showStopButton() {
   $icon.classList.add('fa-stop');
   $icon.classList.remove('fa-play');
+}
+
+function showPlayButton() {
+  $gameBtn.style.visibility = 'visible';
+  $icon.classList.add('fa-play');
+  $icon.classList.remove('fa-stop');
+}
+
+function hideGameButton() {
+  $gameBtn.style.visibility = 'hidden';
 }
 
 function showTimerAndScore() {
@@ -75,10 +107,15 @@ function startGameTimer() {
   timer = setInterval(() => {
     if (remainingTimeSec <= 0) {
       clearInterval(timer);
+      finishGame(CARROT_COUNT === score);
       return;
     }
     updateTimerText(--remainingTimeSec);
   }, 1000);
+}
+
+function stopGameTimer() {
+  clearInterval(timer);
 }
 
 function updateTimerText(time) {
@@ -87,14 +124,61 @@ function updateTimerText(time) {
   $gameTimer.textContent = `${minutes}:${seconds}`;
 }
 
+function showPopUpWithText(text) {
+  $popUpMessage.textContent = text;
+  $popUp.classList.remove('pop-up__hide');
+}
+
+function hidePopUp() {
+  $popUp.classList.add('pop-up__hide');
+}
+
+
 function initGame() {
 // 당근과 벌레를 생성한 뒤 $field에 추가
   // console.log($fieldRect);
+  score = 0;
+
   $field.innerHTML = ''; // 버튼 누를 때마다 리셋, 당근 버그가 쌓이지않음;
   $gameScore.innerText = CARROT_COUNT;
   addItem('carrot', CARROT_COUNT, 'carrot/img/carrot.png');
   addItem('bug', BUG_COUNT, 'carrot/img/bug.png');
 }
+
+function onFieldClick(e) {
+  if (!started) {
+    return;
+  }
+  const target = e.target;
+
+  if (target.matches('.carrot')) {
+    target.remove();
+    score++;
+    playSound(carrotSound);
+    updateScoreBoard();
+    if (score === CARROT_COUNT) {
+      finishGame(true);
+    }
+  } else if (target.matches('.bug')) {
+    playSound(bugSound);
+    finishGame(false);
+  }
+}
+ 
+function playSound(sound) {
+  sound.currentTime = 0;
+  sound.play();
+}
+
+function stopSound(sound) {
+  sound.pause();
+}
+
+function updateScoreBoard() {
+  $gameScore.innerText = CARROT_COUNT - score;
+}
+
+
 
 function addItem(className, count, imgPath) {
   const $x1 = 0;
@@ -104,7 +188,7 @@ function addItem(className, count, imgPath) {
 
   for (let i = 0 ; i < count ; i++) {
     const $item = document.createElement('img');
-    $item.setAttribute('class', 'className');
+    $item.setAttribute('class', className);
     $item.setAttribute('src', imgPath);
     $item.style.position = 'absolute';
     const $x = randomNumber($x1, $x2);
