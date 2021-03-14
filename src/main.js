@@ -1,5 +1,7 @@
 'use strict';
 
+import POPUP from './popup.js';
+
 const CARROT_SIZE = 80;
 const CARROT_COUNT = 5;
 const BUG_COUNT = 5;
@@ -7,17 +9,11 @@ const GAME_DURATION_SEC = 5;
 
 const $field = document.querySelector('.game__field');
 const $fieldRect = $field.getBoundingClientRect();
-
 const $gameBtn = document.querySelector('.game__button');
-const $playBtn = document.querySelector('.play__button');
-
 const $gameTimer = document.querySelector('.game__timer');
 const $gameScore = document.querySelector('.game__score');
-const $popUp = document.querySelector('.pop-up');
-const $popUpRefreshBtn = document.querySelector('.pop-up__refresh');
-const $popUpMessage = document.querySelector('.pop-up__message');
 
-const $icon = document.querySelector('.fas');
+
 
 const carrotSound = new Audio('./carrot/sound/carrot_pull.mp3');
 const bugSound = new Audio('./carrot/sound/bug_pull.mp3');
@@ -29,26 +25,26 @@ let started = false;  // 게임이 시작되었는지
 let score  // 게임 스코어
 let timer = undefined;  // 타이머는 게임 시작 후 세팅
 
+const gameFinishBanner = new POPUP();
+gameFinishBanner.setClickListener(() => {
+  startGame();
+} )
 
 $field.addEventListener('click', onFieldClick);
 
 $gameBtn.addEventListener('click', () => {
   if (started) {
     stopGame();
-
   } else {
     startGame();
   }
 });
 
 // 팝업 재시작 버튼
-$popUpRefreshBtn.addEventListener('click', () => {
-  startGame();
-  hidePopUp();
-  showPlayButton();
-});
-
-
+// $popUpRefreshBtn.addEventListener('click', () => {
+//   startGame();
+//   // hidePopUp();
+// });
 
 function startGame() {
   started = true;
@@ -63,7 +59,8 @@ function stopGame() {
   started = false;
   stopGameTimer();
   hideGameButton();
-  showPopUpWithText('REPLAY❔');
+  gameFinishBanner.showWithText('REPLAY❔')
+  // showPopUpWithText('REPLAY❔');
   playSound(alertSound);
   stopSound(backGroundSound);
 }
@@ -76,20 +73,17 @@ function finishGame(win) {
   } else {
     playSound(bugSound);
   }
-  stopGameTimer();
+  stopGameTimer();  // 타이머 초기화. 안하면 게임 여러번 실행시 졌다는 팝업창이 계속~
   stopSound(backGroundSound);
-  showPopUpWithText(win ? 'YOU WON 🎉' : 'YOU LOST 🤧');
+  gameFinishBanner.showWithText(win ? 'YOU WON 🎉' : 'YOU LOST 🤧');
+  // showPopUpWithText(win ? 'YOU WON 🎉' : 'YOU LOST 🤧');
 }
 
 function showStopButton() {
+  const $icon = document.querySelector('.fas');
   $icon.classList.add('fa-stop');
   $icon.classList.remove('fa-play');
-}
-
-function showPlayButton() {
   $gameBtn.style.visibility = 'visible';
-  $icon.classList.add('fa-play');
-  $icon.classList.remove('fa-stop');
 }
 
 function hideGameButton() {
@@ -107,7 +101,7 @@ function startGameTimer() {
   timer = setInterval(() => {
     if (remainingTimeSec <= 0) {
       clearInterval(timer);
-      finishGame(CARROT_COUNT === score);
+      finishGame(CARROT_COUNT === score);  // true 면 이긴거고 false면 진 거
       return;
     }
     updateTimerText(--remainingTimeSec);
@@ -124,15 +118,14 @@ function updateTimerText(time) {
   $gameTimer.textContent = `${minutes}:${seconds}`;
 }
 
-function showPopUpWithText(text) {
-  $popUpMessage.textContent = text;
-  $popUp.classList.remove('pop-up__hide');
-}
+// function showPopUpWithText(text) {
+//   $popUpMessage.textContent = text;
+//   $popUp.classList.remove('pop-up__hide');
+// }
 
-function hidePopUp() {
-  $popUp.classList.add('pop-up__hide');
-}
-
+// function hidePopUp() {
+//   $popUp.classList.add('pop-up__hide');
+// }
 
 function initGame() {
 // 당근과 벌레를 생성한 뒤 $field에 추가
@@ -164,7 +157,7 @@ function onFieldClick(e) {
     finishGame(false);
   }
 }
- 
+
 function playSound(sound) {
   sound.currentTime = 0;
   sound.play();
@@ -177,8 +170,6 @@ function stopSound(sound) {
 function updateScoreBoard() {
   $gameScore.innerText = CARROT_COUNT - score;
 }
-
-
 
 function addItem(className, count, imgPath) {
   const $x1 = 0;
