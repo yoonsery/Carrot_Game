@@ -4,7 +4,13 @@ import * as sound from './sound.js';
 
 const CARROT_SIZE = 80;
 
-export default class Field {
+
+export const ItemType = Object.freeze({
+  carrot: 'carrot',
+  bug: 'bug',
+})
+
+export class Field {
   constructor(carrotCount, bugCount) {
     this.carrotCount = carrotCount;
     this.bugCount = bugCount;
@@ -15,13 +21,20 @@ export default class Field {
 
   init() {
     this.$field.innerHTML = '';
-    this._addItem('carrot', this.carrotCount, 'carrot/img/carrot.png');
-    this._addItem('bug', this.bugCount, 'carrot/img/bug.png');
+    this._addItem(ItemType.carrot, this.carrotCount, 'carrot/img/carrot.png');
+    this._addItem(ItemType.bug, this.bugCount, 'carrot/img/bug.png');
   }
 
   setClickListener(onItemClick) {
     this.onItemClick = onItemClick;
   }
+  onFieldClickListenr(e) {
+    if(!this.getGameStatus()) {
+      return;
+    }
+    this.onItemClick && this.onItemClick(e.target);
+  }
+
 
   //함수명 앞에_ 붙이는 건 내부에서 쓰는 프라이빗한 함수인걸 표시
   // JS에선 아직 프라이빗 함수가 없어서 _로 표시하지만, 이건 옛날 방식이므로 낫굿
@@ -43,16 +56,15 @@ export default class Field {
       this.$field.appendChild($item);
     }
   }
-
   onClick = (e) => {
     const target = e.target;
 
     if (target.matches('.carrot')) {
       target.remove();
       sound.playCarrot();
-      this.onItemClick && this.onItemClick('carrot');
+      this.onItemClick && this.onItemClick(ItemType.carrot);
     } else if (target.matches('.bug')) {
-      this.onItemClick && this.onItemClick('bug');
+      this.onItemClick && this.onItemClick(ItemType.bug);
     }
   };
 }

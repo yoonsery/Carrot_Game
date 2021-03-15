@@ -1,5 +1,5 @@
 'use strict';
-import Field from './field.js';
+import { ItemType, Field } from './field.js';
 import * as sound from './sound.js';
 
 export const Reason = Object.freeze({
@@ -48,7 +48,7 @@ class Game {
     this.$gameBtn = document.querySelector('.game__button');
     this.$gameBtn.addEventListener('click', () => {
       if (this.started) {
-        this.stop();
+        this.stop(Reason.cancel);
       } else {
         this.start();
       }
@@ -56,6 +56,7 @@ class Game {
 
 
     this.gameField = new Field(carrotCount, bugCount);
+    // this.gameField = new Field(this.carrotCount, this.bugCount, () => this.started);
     this.gameField.setClickListener(this.onItemClick);
 
     this.started = false;  // 게임이 시작되었는지
@@ -78,48 +79,35 @@ class Game {
     sound.playBackground();
   }
 
-  stop() {
+  stop(reason) {
     this.started = false;
     this.stopGameTimer();
     this.hideGameButton();
-    sound.playAlert();
     sound.stopBackground();
-    this.onGameStop && this.onGameStop(Reason.cancel);
+    this.onGameStop && this.onGameStop(reason);
   }
 
-  finish(win) {
-    this.started = false;
-    this.hideGameButton();
-    if (win) {
-      sound.playWin();
-    } else {
-      sound.playBug();
-    }
-    this.stopGameTimer();  // 타이머 초기화. 안하면 게임 여러번 실행시 졌다는 팝업창이 계속~
-    sound.stopBackground();
-    this.onGameStop && this.onGameStop(win ? Reason.win : Reason.lose);
-  }
 
   onItemClick = (item) => {
     if (!this.started) {
       return;
     }  // class Field는 게임이 시작했는지 안했는지 모르므로 얘는 냅둠
 
-    if (item === 'carrot') {
+    if (item === ItemType.carrot) {
       this.score++;    // 필드는 모르므로 필드클래스에서 삭제
       this.updateScoreBoard();  // 필드는 모르므로 필드클래스에서 삭제
       if (this.score === this.carrotCount) { // 필드는 모르므로 필드클래스에서 삭제
-        this.finish(true);
+        this.stop(Reason.win);
       }
-    } else if (item === 'bug') {
-      this.finish(false);
+    } else if (item === ItemType.bug) {
+      this.stop(Reason.lose);
     }
   }
 
   showStopButton() {
     const $icon = document.querySelector('.fas');
     $icon.classList.add('fa-stop');
-    $icon.classList.remove('fa-play');
+    // $icon.classList.remove('fa-play');
     this.$gameBtn.style.visibility = 'visible';
   }
 
@@ -137,7 +125,7 @@ class Game {
     this.timer = setInterval(() => {
       if (remainingTimeSec <= 0) {
         clearInterval(this.timer);
-        this.finish(this.carrotCount === this.score);  // true 면 이긴거고 false면 진 거
+        this.stop(this.carrotCount === this.score ? Reason.win : Reason.lose);  // true 면 이긴거고 false면 진 거
         return;
       }
       this.updateTimerText(--remainingTimeSec);
@@ -158,7 +146,7 @@ class Game {
     // 당근과 벌레를 생성한 뒤 $field에 추가
       // console.log($fieldRect);
     this.score = 0;
-    this.$gameScore.innerText = this.carrotCount;
+    this.updateScoreBoard(this.score);
     this.gameField.init();
   }
 
