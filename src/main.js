@@ -1,27 +1,34 @@
 'use strict';
 
 import POPUP from './popup.js';
-import Field from './field.js';
-import Game from './game.js';
+import { gameBuilder, Reason } from './game.js';
 
 // const CARROT_COUNT = 5;
 // const BUG_COUNT = 5;
 // const GAME_DURATION_SEC = 5;
 
 const gameFinishBanner = new POPUP();
-const game = new Game(5, 5, 5);
+const game = new gameBuilder()
+  .withGameDuration(5)
+  .withCarrotCount(5)
+  .withbugCount(5)
+  .build();
 
-game.setGameListener((reason) => {
-   console.log(reason);
+// const game = new Game(5, 5, 5);
+// 생성자에 인수가 3개 이상 넘어가는 경우 인자를 이렇게 숫자로 표기하는 건 좋지않음
+// so gameBuilder 클래스를 만들거다~
+
+game.setGameListener(reason => {
+
    let message;
    switch (reason) {
-     case 'cancel':
+     case Reason.cancel:
        message = 'REPLAY? 🤔';
       break;
-    case 'win':
+    case Reason.win:
       message = 'YOU WON 🥳';
       break;
-    case 'lose':
+    case Reason.lose:
       message = 'YOU LOST 😵';
       break;
     default:

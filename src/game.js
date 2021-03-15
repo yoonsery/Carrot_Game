@@ -2,9 +2,41 @@
 import Field from './field.js';
 import * as sound from './sound.js';
 
+export const Reason = Object.freeze({
+  win: 'win',
+  lose: 'lose',
+  cancel: 'cancel',
+});
+
+// Builder pattern
+export class gameBuilder {
+  withGameDuration(duration) {
+    this.gameDuration = duration;
+    return this;
+  }
+
+  withCarrotCount(num) {
+    this.carrotCount = num;
+    return this;
+  }
+
+  withbugCount(num) {
+    this.bugCount = num;
+    return this;
+  }
+
+  build() {
+    console.log(this);
+    return new Game(
+      this.gameDuration,
+      this.carrotCount,
+      this.bugCount,
+    );
+  }
+}
 
 
-export default class Game {
+class Game {
 
   constructor(gameDuration, carrotCount, bugCount) {
     this.gameDuration = gameDuration;
@@ -52,7 +84,7 @@ export default class Game {
     this.hideGameButton();
     sound.playAlert();
     sound.stopBackground();
-    this.onGameStop && this.onGameStop('cancel');
+    this.onGameStop && this.onGameStop(Reason.cancel);
   }
 
   finish(win) {
@@ -65,7 +97,7 @@ export default class Game {
     }
     this.stopGameTimer();  // 타이머 초기화. 안하면 게임 여러번 실행시 졌다는 팝업창이 계속~
     sound.stopBackground();
-    this.onGameStop && this.onGameStop(win ? 'win' : 'lose');
+    this.onGameStop && this.onGameStop(win ? Reason.win : Reason.lose);
   }
 
   onItemClick = (item) => {
