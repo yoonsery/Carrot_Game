@@ -28,13 +28,13 @@ export class Field {
   setClickListener(onItemClick) {
     this.onItemClick = onItemClick;
   }
-  onFieldClickListenr(e) {
-    if(!this.getGameStatus()) {
-      return;
-    }
-    this.onItemClick && this.onItemClick(e.target);
-  }
 
+  // onFeildClickListener(e) {
+  //   if (!this.started) {
+  //     return;
+  //   }
+  //   this.onItemClick && this.onItemClick(e.target);
+  // }
 
   //함수명 앞에_ 붙이는 건 내부에서 쓰는 프라이빗한 함수인걸 표시
   // JS에선 아직 프라이빗 함수가 없어서 _로 표시하지만, 이건 옛날 방식이므로 낫굿
@@ -56,6 +56,11 @@ export class Field {
       this.$field.appendChild($item);
     }
   }
+
+  notClickable(property) {
+    this.$field.style.pointerEvents = property;
+  }
+
   onClick = (e) => {
     const target = e.target;
 

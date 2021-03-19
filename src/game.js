@@ -26,7 +26,6 @@ export class gameBuilder {
   }
 
   build() {
-    console.log(this);
     return new Game(
       this.gameDuration,
       this.carrotCount,
@@ -55,8 +54,7 @@ class Game {
     });
 
 
-    this.gameField = new Field(carrotCount, bugCount);
-    // this.gameField = new Field(this.carrotCount, this.bugCount, () => this.started);
+    this.gameField = new Field(this.carrotCount, this.bugCount);
     this.gameField.setClickListener(this.onItemClick);
 
     this.started = false;  // 게임이 시작되었는지
@@ -77,6 +75,7 @@ class Game {
     this.showTimerAndScore();
     this.startGameTimer();
     sound.playBackground();
+    this.gameField.notClickable('auto');
   }
 
   stop(reason) {
@@ -85,13 +84,13 @@ class Game {
     this.hideGameButton();
     sound.stopBackground();
     this.onGameStop && this.onGameStop(reason);
+    this.gameField.notClickable('none');
   }
-
 
   onItemClick = (item) => {
     if (!this.started) {
       return;
-    }  // class Field는 게임이 시작했는지 안했는지 모르므로 얘는 냅둠
+    }
 
     if (item === ItemType.carrot) {
       this.score++;    // 필드는 모르므로 필드클래스에서 삭제
@@ -107,13 +106,13 @@ class Game {
   showStopButton() {
     const $icon = document.querySelector('.fas');
     $icon.classList.add('fa-stop');
-    // $icon.classList.remove('fa-play');
     this.$gameBtn.style.visibility = 'visible';
   }
 
   hideGameButton() {
     this.$gameBtn.style.visibility = 'hidden';
   }
+
   showTimerAndScore() {
     this.$gameTimer.style.visibility = 'visible';
     this.$gameScore.style.visibility = 'visible';
