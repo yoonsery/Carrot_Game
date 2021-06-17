@@ -1,4 +1,5 @@
 'use strict';
+
 import { ItemType, Field } from './field.js';
 import * as sound from './sound.js';
 
@@ -8,8 +9,7 @@ export const Reason = Object.freeze({
   cancel: 'cancel',
 });
 
-// Builder pattern
-export class gameBuilder {
+export class GameBuilder {
   withGameDuration(duration) {
     this.gameDuration = duration;
     return this;
@@ -27,16 +27,14 @@ export class gameBuilder {
 
   build() {
     return new Game(
-      this.gameDuration,
+      this.gameDuration, //
       this.carrotCount,
-      this.bugCount,
+      this.bugCount
     );
   }
 }
 
-
 class Game {
-
   constructor(gameDuration, carrotCount, bugCount) {
     this.gameDuration = gameDuration;
     this.carrotCount = carrotCount;
@@ -45,6 +43,7 @@ class Game {
     this.$gameTimer = document.querySelector('.game__timer');
     this.$gameScore = document.querySelector('.game__score');
     this.$gameBtn = document.querySelector('.game__button');
+
     this.$gameBtn.addEventListener('click', () => {
       if (this.started) {
         this.stop(Reason.cancel);
@@ -53,18 +52,16 @@ class Game {
       }
     });
 
+    this.gameField = new Field(this.carrotCount, this.bugCount,  () => this.started);
 
-    this.gameField = new Field(this.carrotCount, this.bugCount);
     this.gameField.setClickListener(this.onItemClick);
 
-    this.started = false;  // 게임이 시작되었는지
-    this.score  // 게임 스코어
-    this.timer = undefined;  // 타이머는 게임 시작 후 세팅
-
+    this.started = false;
+    this.score = 0;
+    this.timer = undefined;
   }
 
-  // 게임이 끝나면 알려줄 수 있도록 콜백받아옴
-  setGameListener(onGameStop) {
+  setGameStopListener(onGameStop) {
     this.onGameStop = onGameStop;
   }
 
@@ -75,7 +72,6 @@ class Game {
     this.showTimerAndScore();
     this.startGameTimer();
     sound.playBackground();
-    this.gameField.notClickable('auto');
   }
 
   stop(reason) {
@@ -84,7 +80,6 @@ class Game {
     this.hideGameButton();
     sound.stopBackground();
     this.onGameStop && this.onGameStop(reason);
-    this.gameField.notClickable('none');
   }
 
   onItemClick = (item) => {
@@ -93,18 +88,18 @@ class Game {
     }
 
     if (item === ItemType.carrot) {
-      this.score++;    // 필드는 모르므로 필드클래스에서 삭제
-      this.updateScoreBoard();  // 필드는 모르므로 필드클래스에서 삭제
-      if (this.score === this.carrotCount) { // 필드는 모르므로 필드클래스에서 삭제
+      this.score++;
+      this.updateScoreBoard();
+      if (this.score === this.carrotCount) {
         this.stop(Reason.win);
       }
     } else if (item === ItemType.bug) {
       this.stop(Reason.lose);
     }
-  }
+  };
 
   showStopButton() {
-    const $icon = document.querySelector('.fas');
+    const $icon = this.$gameBtn.querySelector('.fas');
     $icon.classList.add('fa-stop');
     this.$gameBtn.style.visibility = 'visible';
   }
@@ -124,7 +119,7 @@ class Game {
     this.timer = setInterval(() => {
       if (remainingTimeSec <= 0) {
         clearInterval(this.timer);
-        this.stop(this.carrotCount === this.score ? Reason.win : Reason.lose);  // true 면 이긴거고 false면 진 거
+        this.stop(this.carrotCount === this.score ? Reason.win : Reason.lose);
         return;
       }
       this.updateTimerText(--remainingTimeSec);
@@ -142,8 +137,6 @@ class Game {
   }
 
   initGame() {
-    // 당근과 벌레를 생성한 뒤 $field에 추가
-      // console.log($fieldRect);
     this.score = 0;
     this.updateScoreBoard(this.score);
     this.gameField.init();

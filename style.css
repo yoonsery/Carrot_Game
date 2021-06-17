@@ -18,6 +18,8 @@ button {
   margin: auto;
   background: url(carrot/img/background.png) center/cover;
   border-radius: 20px;
+  /* margin-top: 50px;
+  position: relative; */
 }
 
 .game__header {
@@ -37,24 +39,19 @@ button {
   transition: transform 300ms ease-in;
 }
 
-/* i.invisable {
-  display: none;
-} */
-
 .game__button:hover {
   transform: scale(1.1);
 }
 
 .game__timer {
   width: 100px;
-  background-color: whitesmoke;
   text-align: center;
-  border: 5px solid black;
-  font-size: 32px;
   margin-top: 8px;
+  font-size: 32px;
+  background-color: whitesmoke;
+  border: 5px solid black;
   border-radius: 20px;
   visibility: hidden;
-  user-select: none;
 }
 
 .game__score {
@@ -69,14 +66,13 @@ button {
   border: 3px solid black;
   border-radius: 50%;
   visibility: hidden;
-  user-select: none;
 }
 
 .game__field {
   position: relative;
   width: 100%;
   height: 100%;
-  margin-top: 40px;  /* 당근, 벌레가 흩뿌려질 범위  */
+  margin-top: 40px;
 }
 
 .pop-up {
@@ -84,7 +80,7 @@ button {
   width: 400px;
   height: 140px;
   margin: auto;
-  background-color: #00000090;  /* 배경만 90% 투명도 줘서 글자, 아이콘은 불투명하게 */
+  background-color: #00000090;
   color: whitesmoke;
   text-align: center;
   padding: 20px;
@@ -103,7 +99,6 @@ button {
   background-color: wheat;
   border: 2px solid black;
   border-radius: 50%;
-
 }
 
 .pop-up__message {
