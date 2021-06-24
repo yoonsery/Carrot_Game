@@ -3,10 +3,10 @@
 Get all carrots within time! <br />
 only carrots not bugs 🐛
 
-👏🏻 Users win when
+👏🏻  Users win when
 - they click all the carrots within time
 
-🙁 Users lose when 
+🙁  Users lose when 
 - they click any bug
 - they fail to click every carrots within time limit
 
