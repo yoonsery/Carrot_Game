@@ -1,7 +1,7 @@
 # [Carrot Game](https://carrot-game.netlify.app/)
 
-Get all carrots within time!
-only carrots not bugs🐛
+Get all carrots within time! <br />
+only carrots not bugs 🐛
 
 👏🏻 Users win when
 - they click all the carrots within time
@@ -36,6 +36,6 @@ this.gameField = new Field(this.carrotCount, this.bugCount,  () => this.started)
 
 💡 **Builder Pattern**
 
-Too many constructor arguments cause more error and make hard to read, 
+Too many constructor arguments cause more error and make hard to read,  <br />
 builder patter solve these problem by separating the construction of a complex object from its representation
 
