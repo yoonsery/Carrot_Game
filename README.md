@@ -1,4 +1,4 @@
-# Carrot Game
+# [Carrot Game](https://carrot-game.netlify.app/)
 
 Get all carrots within time!
 only carrots not bugs🐛
