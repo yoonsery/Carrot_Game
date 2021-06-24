@@ -36,6 +36,6 @@ this.gameField = new Field(this.carrotCount, this.bugCount,  () => this.started)
 
 💡 **Builder Pattern**
 
-Too many constructor arguments cause more error and make hard to read,  <br />
+Too many constructor arguments cause more errors and make hard to read,  <br />
 builder patter solve these problem by separating the construction of a complex object from its representation
 
