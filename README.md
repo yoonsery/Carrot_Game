@@ -21,7 +21,7 @@ Only carrots! Not bugs! 🐛
 
 💡 **There was an issue after finishing game, users still could click and remove carrots**
 
-```
+```js
 export class Field {
   constructor(carrotCount, bugCount, getGameStatus) {
     this.carrotCount = carrotCount;
@@ -30,7 +30,7 @@ export class Field {
 ```
 So I passed `getGameStatus` parameter to check whether game is running or not
 
-```
+```js
 this.gameField = new Field(this.carrotCount, this.bugCount,  () => this.started);
 ```
 
